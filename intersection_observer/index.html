@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>スクロールでヘッダー固定をIntersection Observerでやる</title>
+  <style>
+    *, *:before, *:after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    .box {
+      position: relative;
+    }
+    .box dt, .box dd {
+      padding: 16px;
+    }
+    .box-header {
+      padding: 8px 16px;
+      background-color: #eee;
+    }
+    .box-header.is-sticky {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+    }
+  </style>
+</head>
+<body>
+  <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+  <div class="box js-scrollObserve">
+    <h2 class="box-header js-scrollObserve">ヘッダー</h2>
+    <dl>
+      <dt>dt</dt>
+      <dd>dd</dd>
+      <dt>dt</dt>
+      <dd>dd</dd>
+      <dt>dt</dt>
+      <dd>dd</dd>
+      <dt>dt</dt>
+      <dd>dd</dd>
+      <dt>dt</dt>
+      <dd>dd</dd>
+      <dt>dt</dt>
+      <dd>dd</dd>
+      <dt>dt</dt>
+      <dd>dd</dd>
+      <dt>dt</dt>
+      <dd>dd</dd>
+      <dt>dt</dt>
+      <dd>dd</dd>
+      <dt>dt</dt>
+      <dd>dd</dd>
+      <dt>dt</dt>
+      <dd>dd</dd>
+      <dt>dt</dt>
+      <dd>dd</dd>
+      <dt>dt</dt>
+      <dd>dd</dd>
+    </dl>
+    <dl>
+      <dt>dt</dt>
+      <dd>dd</dd>
+      <dt>dt</dt>
+      <dd>dd</dd>
+      <dt>dt</dt>
+      <dd>dd</dd>
+      <dt>dt</dt>
+      <dd>dd</dd>
+      <dt>dt</dt>
+      <dd>dd</dd>
+      <dt>dt</dt>
+      <dd>dd</dd>
+      <dt>dt</dt>
+      <dd>dd</dd>
+      <dt>dt</dt>
+      <dd>dd</dd>
+      <dt>dt</dt>
+      <dd>dd</dd>
+      <dt>dt</dt>
+      <dd>dd</dd>
+      <dt>dt</dt>
+      <dd>dd</dd>
+      <dt>dt</dt>
+      <dd>dd</dd>
+      <dt>dt</dt>
+      <dd>dd</dd>
+    </dl>
+  </div>
+  <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+  <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+
+  <script>
+    // dom
+    const fixedHeaderBox = document.querySelector(".box");
+    const fixedHeader = document.querySelector(".box-header");
+
+    // headerをクローン
+    const clonedHeader = fixedHeader.cloneNode(true);
+    clonedHeader.classList.add("is-sticky");
+    clonedHeader.style.display = "none";
+    fixedHeaderBox.prepend(clonedHeader);
+
+    // observer - box
+    const boxOptions = {
+      root: null,
+      rootMargin: "0px",
+      threshold: 0
+    };
+    const boxObserver = new IntersectionObserver(boxInview, boxOptions);
+
+    function boxInview(entries) {
+      for (let i = 0; i < entries.length; i++) {
+        const e = entries[i];
+        const isAbove = e.boundingClientRect.y <= e.rootBounds.y;
+        if (e.isIntersecting) {
+          fixedHeaderBox.classList.remove('is-scrollOver');
+          if (isAbove) {
+            clonedHeader.style.display = "block";
+          }
+        } else {
+          if (isAbove) {
+            fixedHeaderBox.classList.add('is-scrollOver');
+            clonedHeader.style.display = "none";
+          }
+        }
+      }
+    }
+    boxObserver.observe(fixedHeaderBox);
+
+    // observer - header
+    const boxHeaderOptions = {
+      root: null,
+      rootMargin: "0px",
+      threshold: 1
+    };
+    const boxHeaderObserver = new IntersectionObserver(boxHeaderInview, boxHeaderOptions);
+
+    function boxHeaderInview(entries) {
+      for (let i = 0; i < entries.length; i++) {
+        const e = entries[i];
+        const isAbove = e.boundingClientRect.y <= e.rootBounds.y;
+        if (e.isIntersecting) {
+          if (!isAbove) {
+            clonedHeader.style.display = "none";
+          }
+        } else {
+          if (isAbove) {
+            clonedHeader.style.display = "block";
+          }
+        }
+      }
+    }
+    boxHeaderObserver.observe(fixedHeader);
+  </script>
+</body>
+</html>
